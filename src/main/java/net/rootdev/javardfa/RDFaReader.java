@@ -54,19 +54,19 @@ public class RDFaReader implements RDFReader {
 
     private XMLReader xmlReader;
 
-    public void read(Model arg0, Reader arg1, String arg2) {
-        this.runParser(arg0, arg2, new InputSource(arg1));
+    public void read(Model model, Reader readr, String base) {
+        this.runParser(model, base, new InputSource(readr));
     }
 
-    public void read(Model arg0, InputStream arg1, String arg2) {
-        this.runParser(arg0, arg2, new InputSource(arg1));
+    public void read(Model model, InputStream in, String base) {
+        this.runParser(model, base, new InputSource(in));
     }
 
-    public void read(Model arg0, String arg1) {
-        this.runParser(arg0, null, new InputSource(arg1));
+    public void read(Model model, String uri) {
+        this.runParser(model, null, new InputSource(uri));
     }
 
-    public Object setProperty(String arg0, Object arg1) {
+    public Object setProperty(String prop, Object val) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -82,10 +82,10 @@ public class RDFaReader implements RDFReader {
         return new JenaStatementSink(arg0);
     }
 
-    private void runParser(Model arg0, String arg2, InputSource source) {
-        StatementSink sink = getSink(arg0);
+    private void runParser(Model model, String base, InputSource source) {
+        StatementSink sink = getSink(model);
         Parser parser = new Parser(sink);
-        parser.setBase(arg2);
+        parser.setBase(base);
         initParser(parser);
         try {
             XMLReader xreader = getReader();
