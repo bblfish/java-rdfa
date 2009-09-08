@@ -29,15 +29,16 @@ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
 CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
-*/
+ */
 package net.rootdev.javardfa;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.nio.charset.Charset;
 import nu.validator.htmlparser.common.XmlViolationPolicy;
 import nu.validator.htmlparser.sax.HtmlParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.rio.ParseErrorListener;
 import org.openrdf.rio.ParseLocationListener;
@@ -55,15 +56,17 @@ import org.xml.sax.helpers.XMLReaderFactory;
  *
  * @author Henry Story <henry.story@bblfish.net>
  */
-public class SesameRDFaParser implements RDFParser {
+public abstract class SesameRDFaParser implements RDFParser {
 
-   public static final RDFFormat rdfaFormat = new RDFFormat("rdfa", "text/html", Charset.forName("utf-8"), ".html", true, false);
+   private static Logger log = LoggerFactory.getLogger(SesameRDFaParser.class);
    ValueFactory valFact;
    RDFHandler handler;
    boolean verifyData = false;
    private XMLReader xmlReader;
+   boolean stopAtFirstError = true;
+   private boolean preserveBNodeIds = false;
 
-   public static class HTMLRDFaReader extends SesameRDFaParser {
+   public static class HTMLRDFaParser extends SesameRDFaParser {
 
       @Override
       public XMLReader getReader() {
@@ -78,9 +81,14 @@ public class SesameRDFaParser implements RDFParser {
       public void initParser(Parser parser) {
          parser.enable(Setting.ManualNamespaces);
       }
+
+      @Override
+      public RDFFormat getRDFFormat() {
+         return RDFaHtmlParserFactory.rdfa_html_Format;
+      }
    }
 
-   public static class XHTMLRDFaReader extends SesameRDFaParser {
+   public static class XHTMLRDFaParser extends SesameRDFaParser {
 
       @Override
       public XMLReader getReader() throws SAXException {
@@ -88,10 +96,10 @@ public class SesameRDFaParser implements RDFParser {
          reader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
          return reader;
       }
-   }
 
-   public RDFFormat getRDFFormat() {
-      return rdfaFormat;
+      public RDFFormat getRDFFormat() {
+         return RDFaXHtmlParserFactory.rdfa_xhtml_Format;
+      }
    }
 
    public void setValueFactory(ValueFactory valueFactory) {
@@ -111,19 +119,20 @@ public class SesameRDFaParser implements RDFParser {
    }
 
    public void setVerifyData(boolean verifyData) {
-      this.verifyData = verifyData;
+      log.warn("not implemented setVerifyData(...) in " + this.getClass().getCanonicalName());
+
    }
 
    public void setPreserveBNodeIDs(boolean preserveBNodeIDs) {
-      throw new UnsupportedOperationException("Not supported yet.");
+      log.warn("not implemented setPreserveBNodeIDs(...) in " + this.getClass().getCanonicalName());
    }
 
    public void setStopAtFirstError(boolean stopAtFirstError) {
-      throw new UnsupportedOperationException("Not supported yet.");
+      log.warn("not implemented setStopAtFirstError(...) in " + this.getClass().getCanonicalName());
    }
 
    public void setDatatypeHandling(DatatypeHandling datatypeHandling) {
-      throw new UnsupportedOperationException("Not supported yet.");
+      log.warn("not impemented setDatatypeHandling(...) yet in " + this.getClass().getCanonicalName());
    }
 
    public void setReader(XMLReader reader) {

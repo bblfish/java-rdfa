@@ -31,6 +31,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * @author Damian Steer <pldms@mac.com>
+ * @author Henry Story <hjs@bblfish.net>
  */
 
 @RunWith(Parameterized.class)

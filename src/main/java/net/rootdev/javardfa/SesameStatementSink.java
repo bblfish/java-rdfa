@@ -67,7 +67,7 @@ public class SesameStatementSink implements StatementSink {
             o = valFactory.createLiteral(lex, lang);
          } else {
             URI dt = valFactory.createURI(datatype);
-            o = valFactory.createLiteral(lex, datatype);
+            o = valFactory.createLiteral(lex, dt);
          }
          handler.handleStatement(valFactory.createStatement(s, p, o));
       } catch (RDFHandlerException ex) {
