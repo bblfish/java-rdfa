@@ -46,9 +46,9 @@ public class RDFaConformance {
    @Parameters
    public static Collection<String[]> testFiles()
            throws URISyntaxException, IOException, SailException, RepositoryException, RDFParseException, MalformedQueryException, QueryEvaluationException {
-      RepositoryConnection conn = SesameScratch.fetchResource(URI.create(ManifestURI).toURL(), RDFFormat.RDFXML);
+      RepositoryConnection conn = SesameUtils.fetchResource(URI.create(ManifestURI).toURL(), RDFFormat.RDFXML);
       URL testsURL = RDFaConformance.class.getResource("/manifest-extract.rq");
-      String testsQueryStr = SesameScratch.getContentAsString(testsURL);
+      String testsQueryStr = SesameUtils.getContentAsString(testsURL);
       System.out.println("query string=" + testsQueryStr);
 
       TupleQuery testsQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, testsQueryStr);
@@ -100,8 +100,8 @@ public class RDFaConformance {
 
       System.err.println("------ running test: " + test + "-----");
       try {
-         RepositoryConnection conn = SesameScratch.fetchResource(new URL(input), RDFFormat.forMIMEType("application/xhtml+xml"));
-         String queryStr = SesameScratch.getContentAsString(new URL(query));
+         RepositoryConnection conn = SesameUtils.fetchResource(new URL(input), RDFFormat.forMIMEType("application/xhtml+xml"));
+         String queryStr = SesameUtils.getContentAsString(new URL(query));
          BooleanQuery q = conn.prepareBooleanQuery(QueryLanguage.SPARQL, queryStr);
          if (q.evaluate() == expected) {
          } else {

@@ -3,15 +3,15 @@
  * All rights reserved.
  * [See end of file]
  */
-
 package rdfa;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.util.FileManager;
-import java.io.InputStream;
+import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
+import net.rootdev.javardfa.SesameUtils;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.turtle.TurtleWriter;
 
 /**
  * Simple command line tool
@@ -20,40 +20,40 @@ import java.util.List;
  */
 public class parse {
 
-    public static void main(String... args) throws ClassNotFoundException {
-        if (args.length == 0) usage();
+   public static void main(String... args) throws Exception {
+      if (args.length == 0) usage();
 
-        // Ensure hooks run
-        Class.forName("net.rootdev.javardfa.RDFaReader");
+      // Ensure hooks run
+      Class.forName("net.rootdev.javardfa.RDFaReader");
 
-        String format = "XHTML";
-        boolean getFormat = false;
+      RDFFormat format = RDFFormat.forMIMEType("application/xhtml+xml");
 
-        List<String> uris = new LinkedList<String>();
+      List<String> uris = new LinkedList<String>();
 
-        for (String arg: args) {
-            if (getFormat) { format = arg; getFormat = false; }
-            else if ("--help".equalsIgnoreCase(arg)) usage();
-            else if ("--format".equalsIgnoreCase(arg)) getFormat = true;
-            else uris.add(arg);
-        }
+      for (int i = 0; i < args.length; i++) {
+         if ("--help".equalsIgnoreCase(args[i])) usage();
+         else if ("--format".equalsIgnoreCase(args[i])) {
+            if (i + 1 >= args.length) usage();
+            String f = args[++i];
+            if ("XHTML".equalsIgnoreCase(f)) {
+               format = RDFFormat.forMIMEType("application/xhtml+xml");
+            } else if ("HTML".equalsIgnoreCase(f)) {
+               format = RDFFormat.forMIMEType("text/html");
+            } else usage();
+         } else uris.add(args[i]);
+      }
 
-        if (getFormat) usage();
 
-        Model m = ModelFactory.createDefaultModel();
-        FileManager fm = FileManager.get();
-        for (String uri: uris) {
-            InputStream in = fm.open(uri);
-            m.read(in, uri, format);
-        }
-        m.write(System.out, "TTL");
-    }
+      for (String uri : uris) {
+         RepositoryConnection conn = SesameUtils.fetchResource(new URL(uri), format);
+         conn.export(new TurtleWriter(System.out));
+      }
+   }
 
-    private static void usage() {
-        System.err.println("rdfa.parse [--format XHTML|HTML] <url> [...]");
-        System.exit(0);
-    }
-
+   private static void usage() {
+      System.err.println("rdfa.parse [--format XHTML|HTML] <url> [...]");
+      System.exit(0);
+   }
 }
 
 /*
