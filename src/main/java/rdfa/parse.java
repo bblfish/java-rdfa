@@ -8,6 +8,8 @@ package rdfa;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
+import net.rootdev.javardfa.RDFaHtmlParserFactory;
+import net.rootdev.javardfa.RDFaXHtmlParserFactory;
 import net.rootdev.javardfa.SesameUtils;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
@@ -23,10 +25,7 @@ public class parse {
    public static void main(String... args) throws Exception {
       if (args.length == 0) usage();
 
-      // Ensure hooks run
-      Class.forName("net.rootdev.javardfa.RDFaReader");
-
-      RDFFormat format = RDFFormat.forMIMEType("application/xhtml+xml");
+      RDFFormat format = RDFaXHtmlParserFactory.rdfa_xhtml_Format;
 
       List<String> uris = new LinkedList<String>();
 
@@ -36,9 +35,9 @@ public class parse {
             if (i + 1 >= args.length) usage();
             String f = args[++i];
             if ("XHTML".equalsIgnoreCase(f)) {
-               format = RDFFormat.forMIMEType("application/xhtml+xml");
+               format = RDFaXHtmlParserFactory.rdfa_xhtml_Format;
             } else if ("HTML".equalsIgnoreCase(f)) {
-               format = RDFFormat.forMIMEType("text/html");
+               format = RDFaHtmlParserFactory.rdfa_html_Format;
             } else usage();
          } else uris.add(args[i]);
       }
@@ -46,7 +45,14 @@ public class parse {
 
       for (String uri : uris) {
          RepositoryConnection conn = SesameUtils.fetchResource(new URL(uri), format);
-         conn.export(new TurtleWriter(System.out));
+         TurtleWriter tw = new TurtleWriter(System.out);
+         tw.handleNamespace("foaf", "http://xmlns.com/foaf/0.1/");
+         tw.handleNamespace("geo", "http://www.geonames.org/ontology/");
+         tw.handleNamespace("rel", "http://purl.org/vocab/relationship/");
+         tw.handleNamespace("cert", "http://www.w3.org/ns/auth/cert#");
+         tw.handleNamespace("rsa", "http://www.w3.org/ns/auth/rsa#");
+         tw.handleNamespace("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
+         conn.export(tw);
       }
    }
 
