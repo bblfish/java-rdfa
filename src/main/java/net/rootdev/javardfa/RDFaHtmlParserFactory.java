@@ -20,7 +20,7 @@ public class RDFaHtmlParserFactory implements RDFParserFactory {
    public static final RDFFormat rdfa_html_Format;
 
    static {
-      rdfa_html_Format = new RDFFormat("rdfa", "text/html",
+      rdfa_html_Format = new RDFFormat("rdfa-html", "text/html",
               Charset.forName("UTF-8"), "html", true, false);
       RDFFormat.register(rdfa_html_Format);
    }
